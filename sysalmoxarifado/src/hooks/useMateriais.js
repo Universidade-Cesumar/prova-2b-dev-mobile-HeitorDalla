@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
-import { cadastrarMaterial as enviarMaterial, listarMateriais } from '../services/materiaisService';
+import {
+  atualizarMaterial,
+  cadastrarMaterial as enviarMaterial,
+  excluirMaterial,
+  listarMateriais,
+} from '../services/materiaisService';
+import { validarRetirada } from '../../../src/utils/validacoes';
 
 export default function useMateriais() {
   const [materiais, setMateriais] = useState([]);
@@ -58,6 +64,69 @@ export default function useMateriais() {
     }
   }
 
+  async function baixarMaterial(id, estoqueAtual, quantidadeRetirada) {
+    if (!validarRetirada(estoqueAtual, quantidadeRetirada)) {
+      Alert.alert('Atenção', 'A quantidade de retirada é inválida.');
+      return false;
+    }
+
+    const materialOriginal = materiais.find((material) => material.id === id);
+
+    if (!materialOriginal) {
+      Alert.alert('Erro', 'Material não encontrado para atualização.');
+      return false;
+    }
+
+    const materialAtualizado = {
+      ...materialOriginal,
+      quantidade: Number(estoqueAtual) - Number(quantidadeRetirada),
+    };
+    // atualiza UI imediatamente e reverte em caso de erro
+    const listaAnterior = materiais;
+
+    setMateriais((listaAtual) =>
+      listaAtual.map((material) =>
+        material.id === id ? { ...material, quantidade: materialAtualizado.quantidade } : material,
+      ),
+    );
+
+    setSending(true);
+
+    try {
+      await atualizarMaterial(id, materialAtualizado);
+      await carregarMateriais();
+
+      return true;
+    } catch (error) {
+      // reverte o estado anterior
+      setMateriais(listaAnterior);
+      Alert.alert('Erro', 'Não foi possível concluir a baixa do material.');
+      return false;
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function removerMaterial(id) {
+    const listaAnterior = materiais;
+
+    // Otimista: remove localmente antes de aguardar o servidor
+    setMateriais((listaAtual) => listaAtual.filter((material) => material.id !== id));
+    setSending(true);
+
+    try {
+      await excluirMaterial(id);
+      return true;
+    } catch (error) {
+      // reverte a lista se falhar
+      setMateriais(listaAnterior);
+      Alert.alert('Erro', 'Não foi possível excluir o material.');
+      return false;
+    } finally {
+      setSending(false);
+    }
+  }
+
   return {
     materiais,
     loading,
@@ -67,5 +136,7 @@ export default function useMateriais() {
     setNome,
     setQuantidade,
     cadastrarMaterial,
+    baixarMaterial,
+    removerMaterial,
   };
 }
