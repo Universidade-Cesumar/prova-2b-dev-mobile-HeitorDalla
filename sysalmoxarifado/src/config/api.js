@@ -1,1 +1,1 @@
-export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://6a2b3cafb687a7d5cbc4ff18.mockapi.io/api/meteriais';
+export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://6a2b3cafb687a7d5cbc4ff18.mockapi.io/api/materiais';
