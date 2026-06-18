@@ -63,3 +63,19 @@ export async function atualizarMaterial(id, dadosAtualizados) {
 
   return response.json();
 }
+
+export async function excluirMaterial(id) {
+  if (!API_URL) {
+    throw new Error('Configure a MockAPI antes de excluir materiais.');
+  }
+
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('Falha ao excluir o material.');
+  }
+
+  return true;
+}
