@@ -15,6 +15,8 @@ export default function App() {
     setNome,
     setQuantidade,
     cadastrarMaterial,
+    baixarMaterial,
+    removerMaterial,
   } = useMateriais();
 
   return (
@@ -40,7 +42,7 @@ export default function App() {
 
       <View style={styles.listContainer}>
         <Text style={styles.sectionTitle}>Estoque atual</Text>
-        <MaterialList materiais={materiais} loading={loading} />
+        <MaterialList materiais={materiais} loading={loading} onBaixar={baixarMaterial} onExcluir={removerMaterial} />
       </View>
     </SafeAreaView>
   );
