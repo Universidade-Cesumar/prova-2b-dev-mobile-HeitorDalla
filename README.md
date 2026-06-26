@@ -1,52 +1,82 @@
 # Sistema de Almoxarifado
-Aplicativo mobile em React Native (Expo) para controle simples de estoque: cadastro, listagem, baixa rápida e exclusão de materiais.
 
-**Resumo rápido**
+Aplicativo mobile desenvolvido em React Native com Expo para controle simples de materiais. O objetivo do projeto é atender um fluxo básico de almoxarifado com cadastro, pesquisa, baixa de estoque e exclusão, mantendo a interface leve e adequada ao uso em celular.
 
-- Entrada do app: [App.js](App.js)
-- Implementação principal: [sysalmoxarifado/App.js](sysalmoxarifado/App.js)
-- Componentes e hooks em: [sysalmoxarifado/src/](sysalmoxarifado/src/)
+## Visão geral
 
-**O que entrega**
+O sistema trabalha com uma lista de materiais vinda de uma API externa e atualiza a interface de forma direta. O fluxo principal é este:
 
-- Formulário para cadastrar novos materiais (`POST`).
-- Lista do estoque atual com `FlatList`.
-- Baixa rápida de estoque (subtrair quantidade) com persistência (`PUT`) e validação.
-- Exclusão permanente de materiais (`DELETE`).
-- Testes automatizados com Jest (sprints 1-3) e `testID`s obrigatórios para autograding.
+1. cadastrar um material novo;
+2. consultar a lista atual de estoque;
+3. pesquisar em tempo real;
+4. baixar quantidade de um item;
+5. remover material quando necessário.
 
-**Estrutura relevante**
+Existe também uma regra visual para estoque crítico. Quando a quantidade fica abaixo de 10 unidades, o card recebe um destaque vermelho e a marcação de acessibilidade prevista no contrato da atividade.
 
+## O que o projeto cobre hoje
+
+- Cadastro de materiais com persistência via API.
+- Lista de estoque com totalizador atualizado conforme o filtro.
+- Pesquisa em tempo real no topo da tela.
+- Indicador visual para estoque crítico.
+- Tratamento de falhas de rede com alertas na interface.
+- Testes automatizados cobrindo as sprints 1, 2 e 3.
+
+## Estrutura que importa
+
+- Entrada do projeto: [App.js](App.js)
 - Tela principal: [sysalmoxarifado/App.js](sysalmoxarifado/App.js)
-- Formulário: [sysalmoxarifado/src/components/MaterialForm.js](sysalmoxarifado/src/components/MaterialForm.js)
-- Lista / controles: [sysalmoxarifado/src/components/MaterialList.js](sysalmoxarifado/src/components/MaterialList.js)
-- Estado e integração: [sysalmoxarifado/src/hooks/useMateriais.js](sysalmoxarifado/src/hooks/useMateriais.js)
-- Chamadas HTTP: [sysalmoxarifado/src/services/materiaisService.js](sysalmoxarifado/src/services/materiaisService.js)
-- Validações: [src/utils/validacoes.js](src/utils/validacoes.js)
-- Configuração de URL da API: [sysalmoxarifado/src/config/api.js](sysalmoxarifado/src/config/api.js)
+- Formulário de cadastro: [sysalmoxarifado/src/components/MaterialForm.js](sysalmoxarifado/src/components/MaterialForm.js)
+- Lista e cards de materiais: [sysalmoxarifado/src/components/MaterialList.js](sysalmoxarifado/src/components/MaterialList.js)
+- Estado e regras de ação: [sysalmoxarifado/src/hooks/useMateriais.js](sysalmoxarifado/src/hooks/useMateriais.js)
+- Integração com API: [sysalmoxarifado/src/services/materiaisService.js](sysalmoxarifado/src/services/materiaisService.js)
+- Validação de retirada: [src/utils/validacoes.js](src/utils/validacoes.js)
 
-**Como rodar (local)**
+## Como executar com Expo
 
-1. Instale dependências:
+1. Instale as dependências.
 
 ```bash
 npm install --legacy-peer-deps
 ```
 
-2. Defina a URL da MockAPI (opcional): exporte `EXPO_PUBLIC_API_URL` ou edite `sysalmoxarifado/src/config/api.js`.
+2. Configure a API, se for usar uma base própria.
 
-3. Inicie o app:
+O projeto lê a variável `EXPO_PUBLIC_API_URL`. Se ela não estiver definida, o app usa a URL da MockAPI configurada em [sysalmoxarifado/src/config/api.js](sysalmoxarifado/src/config/api.js).
+
+3. Inicie o Expo.
 
 ```bash
 npm start
 ```
 
-4. Rode os testes (mesmo comando do CI):
+4. Abra no Expo Go ou no emulador.
+
+5. Rode os testes automatizados.
 
 ```bash
 npm test
 ```
 
-**Author**
+## Testes
 
-Desenvolvidor pelo Heitor Giussani Dalla Villa
+Os testes usados no projeto estão em [__tests__/](__tests__). Eles cobrem três pontos principais:
+
+- existência dos `testID`s obrigatórios;
+- validação lógica da retirada de estoque;
+- busca em tempo real com totalizador.
+
+Para uma checagem rápida antes de qualquer alteração, `npm test` já é suficiente.
+
+## Evidências visuais
+
+Adicionar aqui as capturas de tela do app rodando com Expo:
+
+- tela inicial com formulário e estoque;
+- busca filtrando itens e totalizador mudando;
+- card com estoque crítico destacado em vermelho.
+
+## Autor
+
+Heitor Giussani Dalla Villa.
