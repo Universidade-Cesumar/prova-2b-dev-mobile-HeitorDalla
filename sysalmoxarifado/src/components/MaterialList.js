@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
-import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 function MaterialCard({ item, onBaixar, onExcluir }) {
   const [quantidadeRetirada, setQuantidadeRetirada] = useState('');
+  const estoqueCritico = Number(item.quantidade) < 10;
 
   async function handleBaixar() {
     const sucesso = await onBaixar(item.id, item.quantidade, quantidadeRetirada);
@@ -14,9 +15,14 @@ function MaterialCard({ item, onBaixar, onExcluir }) {
   }
 
   return (
-    <View style={styles.card}>
+    <View
+      accessibilityLabel={estoqueCritico ? 'estoque-critico' : undefined}
+      style={[styles.card, estoqueCritico && styles.cardCritico]}
+    >
       <Text style={styles.materialNome}>{item.nome}</Text>
       <Text style={styles.materialQuantidade}>Quantidade: {item.quantidade}</Text>
+
+      {estoqueCritico ? <Text style={styles.alertaTexto}>Estoque crítico</Text> : null}
 
       <TextInput
         testID="input-retirada"
@@ -42,10 +48,6 @@ function MaterialCard({ item, onBaixar, onExcluir }) {
 }
 
 export default function MaterialList({ materiais, loading, onBaixar, onExcluir }) {
-  function renderItem({ item }) {
-    return <MaterialCard item={item} onBaixar={onBaixar} onExcluir={onExcluir} />;
-  }
-
   return (
     <View style={styles.container} testID="lista-materials">
       {loading ? (
@@ -55,28 +57,25 @@ export default function MaterialList({ materiais, loading, onBaixar, onExcluir }
         </View>
       ) : null}
 
-      <FlatList
-        testID="lista-materiais"
-        data={loading ? [] : materiais}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={materiais.length === 0 ? styles.emptyList : styles.listContent}
-        ListEmptyComponent={<Text style={styles.emptyText}>Nenhum material cadastrado ainda.</Text>}
-      />
+      <View testID="lista-materiais" style={materiais.length === 0 ? styles.emptyList : styles.listContent}>
+        {loading ? null : materiais.length === 0 ? (
+          <Text style={styles.emptyText}>Nenhum material cadastrado ainda.</Text>
+        ) : (
+          materiais.map((item) => <MaterialCard key={item.id} item={item} onBaixar={onBaixar} onExcluir={onExcluir} />)
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    gap: 12,
   },
   listContent: {
-    paddingBottom: 24,
     gap: 12,
   },
   emptyList: {
-    flexGrow: 1,
     justifyContent: 'center',
   },
   emptyText: {
@@ -85,7 +84,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   loadingContainer: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
@@ -101,6 +99,10 @@ const styles = StyleSheet.create({
     borderColor: '#243455',
     gap: 12,
   },
+  cardCritico: {
+    backgroundColor: '#3b1717',
+    borderColor: '#ef4444',
+  },
   materialNome: {
     color: '#f8fafc',
     fontSize: 17,
@@ -110,6 +112,12 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     marginTop: 6,
     fontSize: 14,
+  },
+  alertaTexto: {
+    color: '#fca5a5',
+    fontSize: 13,
+    fontWeight: '700',
+    textTransform: 'uppercase',
   },
   input: {
     backgroundColor: '#f8fafc',
