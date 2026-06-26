@@ -25,6 +25,7 @@ export default function useMateriais() {
       const materiaisCarregados = await listarMateriais();
       setMateriais(materiaisCarregados);
     } catch (error) {
+      Alert.alert('Erro de conexão', 'Não foi possível carregar os materiais. Verifique sua internet e tente novamente.');
       setMateriais([]);
     } finally {
       setLoading(false);
